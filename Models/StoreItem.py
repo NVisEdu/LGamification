@@ -7,7 +7,6 @@ from app_database import database as appdb
 class StoreItemModel(appdb.modelBase):
     __tablename__ = 'store_items'
 
-    id: Type[int] = props(Integer, primary_key=True)
     name: Type[str] = props(String(32))
     description: Type[str] = props(String(128))
     cost: Type[int]

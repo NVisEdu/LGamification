@@ -16,40 +16,54 @@ class TaskModel(ModelBase):
 
     title:  Type[str] = props(String(32))
     status: Type[str]  # Set(ToDo, Doing, Done)
-    due = DateTime()
+    due = props(DateTime, nullable=True)
 
-    xp:   Type[int]
-    cash: Type[int]
+    xp:   Type[int] = props(nullable=True)
+    cash: Type[int] = props(nullable=True)
 
-    difficulty: Type[str]  # Set(Easy,  Normal, Medium, Hard, Very hard)
-    duration:   Type[str]  # Set(Quick, Normal, Medium, Long, Very long)
+    difficulty: Type[str] = props(nullable=True)  # Set(Easy,  Normal, Medium, Hard, Very hard)
+    duration:   Type[str] = props(nullable=True)  # Set(Quick, Normal, Medium, Long, Very long)
 
     userID:      Type[int] = props(FK("users.ID",      ondelete="CASCADE"))
-    objectiveID: Type[int] = props(FK(ObjectiveModel.ID, ondelete="CASCADE"))
 
     # Relationships
-    user:   Type["UserModel"] = rltn()
-    tags:   Type[list["TagModel"]]   = reltn()
-    skills: Type[list["SkillModel"]] = reltn()
+    # user:   Type["UserModel"] = rltn()
+    # tags:   Type[list["TagModel"]]   = reltn()
+    # skills: Type[list["SkillModel"]] = reltn()
 
     def __init__(self,
                  userID: int,
-                 title: None | str = None):
+                 title: None | str = None,
+                 status: str = "ToDo"):
         super().__init__()
         self.userID = userID
         self.title  = title
+        self.status = status
 
 
 class TaskRepository(Singleton):
     _Model = TaskModel
 
+    @property
+    def model(self):
+        return self._Model
+
     def get(self, ID: int):
         return appdb.session.execute(
             db.select(self._Model)
             .where(self._Model.ID == ID)
-        ).one_or_none()
+        ).scalar_one_or_none()
 
-    def create(self, userID) -> TaskModel:
-        task = self._Model(userID)
+    def create(self, userID, title) -> TaskModel:
+        task = self._Model(userID, title)
+        task.status = "ToDo"
         appdb.session.add(task)
+        appdb.session.commit()
         return task
+
+    def get_all_by_user(self, userID: int) -> tuple[_Model]:
+        res = appdb.session.execute(
+            db.select(self._Model)
+            .where(self._Model.userID == int(userID))
+        ).scalars().all()
+        return res

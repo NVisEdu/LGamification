@@ -1,5 +1,6 @@
 import sqlalchemy.orm
 
+from App import logger
 from Models.ModelBase import ModelBase
 from design_patterns import Singleton
 
@@ -18,7 +19,10 @@ class Database(Singleton):
             sqlalchemy.text("PRAGMA foreign_keys=ON")
         )
 
-        print("CREATING DATABASE TABLES...")
+        self.create_tables()
+
+    def create_tables(self):
+        logger.debug("CREATING DATABASE TABLES...")
         self.modelBase.metadata.create_all(bind=self.engine)
 
 

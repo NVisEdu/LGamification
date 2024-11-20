@@ -1,14 +1,11 @@
+import datetime
 import logging
 
-from flask import Flask
-from flask_restx import Api
-
+from App import app, api, logger
 from Controllers import namespaces
 from app_database import Database
 
-
 # Flask
-app = Flask(__name__)
 app.secret_key = "very_secret_key_bro_trust_me_its_secure_af_i_bet_ur_mom"
 app.config["SESSION_TYPE"] = "SQLAlchemy"
 logging.basicConfig(
@@ -18,16 +15,17 @@ logging.basicConfig(
 
 
 # Flask-RestX-Swagger
-api = Api()
 api.init_app(app)
+logger.debug(f"App initialized: {api}")
 for ns in namespaces:
+    logger.debug(f"Namespace added: \"{ns.name}\"")
     api.add_namespace(ns)
-    print(f"namespace {ns.name} was added to api.")
 
 
 def main():
-    print("App launched.")
-    app.run(debug=True)
+    logger.debug(f"App launched: {api}")
+    Database()
+    app.run(debug=True, use_reloader=False)
 
 
 if __name__ == '__main__':

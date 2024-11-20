@@ -10,7 +10,6 @@ from interface import implements
 class GoalModel(appdb.modelBase):
     __tablename__ = 'goals'
 
-    id: Type[int] = props(Integer, primary_key=True)
     title: Type[str] = props(String(32))
     priority: Type[str]  # Set(Low, Normal, Medium, High, Very high, Urgent)
     status: Type[str]  # Set(Planned, In progress, Achieved)
@@ -20,8 +19,8 @@ class GoalModel(appdb.modelBase):
     difficulty: Type[str]  # Set(Easy, Normal, Medium, Hard, Very hard)
     duration: Type[str]  # Set(Quick, Normal, Medium, Long, Very long)
 
-    user_id: Type[int] = props(ForeignKey("users.id"))
-    user: Type["UserModel"] = rltn("User", back_populates="goals")
+    user_id: Type[int] = props(ForeignKey("users.ID"))
+    # user: Type["UserModel"] = rltn("User", back_populates="goals")
 
 
 class GoalRepository():

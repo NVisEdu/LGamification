@@ -18,12 +18,13 @@ class ObjectiveModel(appdb.modelBase):
     duration:   Type[str]  # Set(Quick, Normal, Medium, Long, Very long)
 
     user_id: Type[int] = props(FK("users.ID"))
-    user:  Type["UserModel"] = rltn("UserModel", back_populates="objectives",
-                                    passive_deletes=True, cascade=appdb.default_cascade)
-    tags:   Type["TagModel"]   = rltn("TagModel", back_populates="objectives",
-                                      passive_deletes=True, cascade=appdb.default_cascade)
-    skills: Type["SkillModel"] = rltn("SkillModel", back_populates="objectives",
-                                      passive_deletes=True, cascade=appdb.default_cascade)
+
+    # user:  Type["UserModel"] = rltn("UserModel", back_populates="objectives",
+    #                                 passive_deletes=True, cascade=appdb.default_cascade)
+    # tags:   Type["TagModel"]   = rltn("TagModel", back_populates="objectives",
+    #                                   passive_deletes=True, cascade=appdb.default_cascade)
+    # skills: Type["SkillModel"] = rltn("SkillModel", back_populates="objectives",
+    #                                   passive_deletes=True, cascade=appdb.default_cascade)
 
     def __init__(self,
                  title: None | str = None):

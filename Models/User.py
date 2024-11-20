@@ -20,7 +20,7 @@ class UserModel(appdb.modelBase):
 
     username: Col[str] = props(String(16))
     password: Col[str] = props(String(32))
-    nickname: Col[str] = props(String(32))
+    nickname: Col[str] = props(String(32), nullable=True)
 
     lvl:      Col[int]
     xp:       Col[int]
@@ -28,21 +28,37 @@ class UserModel(appdb.modelBase):
     hp:       Col[int]
     max_hp:   Col[int]
 
-    cultivators: Col[list['CultivatorModel']] = rltn("Cultivator", back_populates="user")
-    stats:       Col[list['StatModel']]       = rltn("Stat", back_populates="user")
-    skills:      Col[list['SkillModel']]      = rltn("Skill", back_populates="user")
-    dailies:     Col[list['DailieModel']]     = rltn("Dailie", back_populates="user")
-    goals:       Col[list['GoalModel']]       = rltn("Goal", back_populates="user")
-    objectives:  Col[list['ObjectiveModel']]  = rltn("Objective", back_populates="user")
-    action_logs: Col[list['ActionLogModel']]  = rltn("ActionLog", back_populates="user")
+    # cultivators: Col[list['CultivatorModel']] = rltn("Models.Cultivator.CultivatorModel",
+    #                                                  back_populates="user", lazy='dynamic')
+    # stats:       Col[list['StatModel']]       = rltn("Models.Stat.StatModel",
+    #                                                  back_populates="user", lazy='dynamic')
+    # skills:      Col[list['SkillModel']]      = rltn("Models.Skill.SkillModel",
+    #                                                  back_populates="user", lazy='dynamic')
+    # dailies:     Col[list['DailieModel']]     = rltn("Models.Dailie.DailieModel",
+    #                                                  back_populates="user", lazy='dynamic')
+    # goals:       Col[list['GoalModel']]       = rltn("Models.Goal.GoalModel",
+    #                                                  back_populates="user", lazy='dynamic')
+    # objectives:  Col[list['ObjectiveModel']]  = rltn("Models.Objective.ObjectiveModel",
+    #                                                  back_populates="user", lazy='dynamic')
+    # action_logs: Col[list['ActionLogModel']]  = rltn("Models.ActionLog.ActionLogModel",
+    #                                                  back_populates="user", lazy='dynamic')
 
     def __init__(self, username: str, password: str):
         self.username = username
         self.password = generate_password_hash(password)
+        self.lvl = 0
+        self.xp = 0
+        self.cash = 100
+        self.max_hp = 100
+        self.hp = 100
 
 
 class UserRepository(RepositoryGettableAbstract):
     _Model = UserModel
+
+    @property
+    def model(self):
+        return self._Model
 
     def get(self, ID: int):
         return cast(self._Model, super().get(ID))
@@ -52,10 +68,9 @@ class UserRepository(RepositoryGettableAbstract):
         dbs.delete(user)
         dbs.commit()
 
-    def create(self, username: str, password: str) -> _Model:
-        res = dbs.add(
-            self._Model(username, password)
-        )
+    def create(self, username: str, password: str) -> "_Model":
+        res = self._Model(username, password)
+        dbs.add(res)
         dbs.commit()
         return res
 
@@ -67,5 +82,3 @@ class UserRepository(RepositoryGettableAbstract):
 
     def is_username_taken(self, name: str) -> bool:
         return True if self.get_by_name(name) else False
-
-

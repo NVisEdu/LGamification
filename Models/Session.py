@@ -3,7 +3,6 @@ import secrets
 from sqlalchemy import ForeignKey as FK, delete, select
 from sqlalchemy.orm import Mapped as Col, mapped_column as props, relationship as rltn
 
-from Models.User import UserModel
 from abstractions import RepositoryAbstract
 from app_database import database as appdb
 
@@ -15,17 +14,17 @@ class SessionModel(appdb.modelBase):
     key:    Col[str] = props(unique=True, nullable=False)
     userID: Col[int] = props(FK("users.ID", ondelete="CASCADE"), nullable=False)
 
-    user: Col['UserModel'] = rltn("User", back_populates="session")
+    # user: Col['UserModel'] = rltn("UserModel", back_populates="session")
 
     def __init__(self, userID: int, key: str = None):
-        self.key    = key or secrets.token_urlsafe(16)
         self.userID = userID
+        self.key    = key or secrets.token_urlsafe(16)
 
 
 class SessionRepository(RepositoryAbstract):
     _Model = SessionModel
 
-    def get(self, sessionkey) -> _Model:
+    def get(self, sessionkey) -> _Model | None:
         return dbs.execute(
             select(self._Model)
             .where(self._Model.key == sessionkey)

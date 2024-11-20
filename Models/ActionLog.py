@@ -1,14 +1,13 @@
-from typing import cast, override
+import datetime
+from typing import cast
 
-from sqlalchemy import String, DateTime, ForeignKey as FK
-from sqlalchemy.orm import Mapped as Type, mapped_column as props, relationship as rltn
+from sqlalchemy import String, DateTime, ForeignKey as FK, select
+from sqlalchemy.orm import Mapped as Type, mapped_column as props
 
-from abstractions import FacadeAbstract, RepositoryGettableAbstract
+from abstractions import RepositoryGettableAbstract
 from app_database import database as appdb
 
-from interface import implements
 from design_patterns import Singleton
-# from interfaces import IRepository, IFacade
 
 dbs = appdb.session
 
@@ -17,47 +16,55 @@ class ActionLogModel(appdb.modelBase):
     __tablename__ = 'action_logs'
 
     title:  Type[str] = props(String(32))
-    date = DateTime()
+    date:   Type[DateTime] = props(DateTime, nullable=False)
 
-    cash:   Type[int]
-    xp:     Type[int]
-    hp:     Type[int]
-    sp:     Type[int]
+    cash:   Type[int] = props(nullable=True)
+    xp:     Type[int] = props(nullable=True)
+    hp:     Type[int] = props(nullable=True)
+    sp:     Type[int] = props(nullable=True)
 
-    user_id: Type[int] = props(FK("users.ID"))
-    user: Type["UserModel"] = rltn("User", back_populates="action_logs")
+    userID: Type[int] = props(FK("users.ID"))
+    # user: Type["UserModel"] = rltn("User", back_populates="action_logs")
+
+    def __init__(self, userID: int,
+                 title: str,
+                 date: datetime.datetime = None,
+                 cash: int = None,
+                 xp: int = None,
+                 hp: int = None,
+                 sp: int = None):
+        self.userID = userID
+
+        if date is None:
+            date = datetime.datetime.now(datetime.timezone.utc)
+
+        self.title = title
+        self.date  = date
+        self.cash = cash
+        self.xp = xp
+        self.hp = hp
+        self.sp = sp
 
 
 class ActionLogRepository(RepositoryGettableAbstract, Singleton):
     _Model = ActionLogModel
 
+    @property
+    def model(self):
+        return self._Model
+
     def get(self, ID: int):
-        return cast(self._Model, super().get(ID))
+        return super().get(ID)
 
     @staticmethod
-    def get_tuple(userID: int, limit: int = 100) -> tuple[_Model]:
+    def get_all_by_user(userID: int, limit: int = 100) -> tuple[_Model]:
         res = dbs.execute(
-            dbs.select(ActionLogModel)
-            .where(ActionLogModel.user_id == userID)
-            .fetch(limit)
-        ).all()
+            select(ActionLogModel)
+            .where(ActionLogModel.userID == int(userID)).limit(limit)
+        ).scalars().all()
         return res
 
     @staticmethod
-    def delete(user: "UserModel"):
-        dbs.delete(user)
-
-    def create(self, username: str, password: str):
-        return dbs.add(
-            self._Model(username, password)
-        )
-
-
-class ActionLogFacade(FacadeAbstract):
-    _model = ActionLogModel
-    _Repo = ActionLogRepository()
-    entry: _model
-
-    @staticmethod
-    def get(ID: int) -> "ActionLogFacade":
-        return ActionLogRepository().get(ID)
+    def delete(entry: _Model):
+        dbs.delete(entry)
+        dbs.commit()

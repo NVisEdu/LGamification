@@ -6,20 +6,6 @@ from sqlalchemy.orm import Mapped as Type, mapped_column as props, relationship,
 from app_database import database as appdb
 
 
-class Skill(appdb.modelBase):
-    __tablename__ = "skills"
-
-    # Columns
-    name:  Type[str] = db.Column(String(16))
-    sp:    Type[int]
-    level: Type[int]
-
-    userID: Type[int] = props(FK("users.id", ondelete="CASCADE"))
-
-    # Relationships
-    user: Type["User"] = relationship()
-
-
 class SkillModel(appdb.modelBase):
     __tablename__ = 'skills'
 
@@ -27,5 +13,6 @@ class SkillModel(appdb.modelBase):
     level:  Type[int]
     score:  Type[int]
 
-    user_id: Type[int] = props(FK("users.id"))
-    user:   Type["User"] = rltn("User", back_populates="skills")
+    userID:  Type[int] = props(FK("users.ID", ondelete="CASCADE"))
+
+    # user:   Type["User"] = rltn("User", back_populates="skills")

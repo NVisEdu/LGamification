@@ -10,8 +10,8 @@ class TagModel(appdb.modelBase):
     ID     = db.Column(db.Integer, primary_key=True)
     name   = db.Column(db.String(16))
     userID = db.Column(db.Integer,
-                       db.ForeignKey("users.id", ondelete="CASCADE")
+                       db.ForeignKey("users.ID", ondelete="CASCADE")
                        )
 
     # Relationships
-    user  = db.orm.Relationship("User", back_populates="tasks")
+    # user = db.orm.Relationship("User", back_populates="tasks")

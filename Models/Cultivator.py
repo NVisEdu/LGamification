@@ -2,10 +2,8 @@ from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import Mapped as Type, mapped_column as props, relationship as rltn
 
 from Models.User import UserModel
+from abstractions import RepositoryAbstract
 from app_database import database as appdb
-
-from interface import implements
-from interfaces import IRepository
 
 
 class CultivatorModel(appdb.modelBase):
@@ -16,12 +14,12 @@ class CultivatorModel(appdb.modelBase):
     hp:     Type[int]
     sp:     Type[int]
 
-    stats_id:  Type[int] = props(ForeignKey("stats.id"))
-    skills_id: Type[int] = props(ForeignKey("skills.id"))
+    stats_id:  Type[int] = props(ForeignKey("stats.ID"))
+    skills_id: Type[int] = props(ForeignKey("skills.ID"))
 
-    user_id: Type[int]   = props(ForeignKey("users.id"))
-    user:   Type["UserModel"] = rltn("User", back_populates="cultivators")
+    user_id: Type[int]   = props(ForeignKey("users.ID"))
+    # user: Type["UserModel"] = rltn("User", back_populates="cultivators")
 
 
-class CultivatorRepository(implements(IRepository)):
+class CultivatorRepository(RepositoryAbstract):
     _Model = CultivatorModel

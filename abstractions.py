@@ -3,14 +3,12 @@ from dataclasses import dataclass
 from typing import Type, cast, Protocol
 
 import sqlalchemy as db
-from interface import implements
+import flask_restx
 from sqlalchemy import select
 
 from Models.ModelBase import ModelBase
 from app_database import database
 from design_patterns import Singleton
-
-# from interfaces import IRepository, IFacade
 
 dbs = database.session
 
@@ -26,15 +24,14 @@ class RepositoryAbstract(Singleton, ABC):
             )
 
     def create(self, *args) -> "_Model":
-        res = dbs.add(
-            self._Model(*args)
-        )
+        res = self._Model(*args)
+        dbs.add(res)
         dbs.commit()
         return res
 
 
 class RepositoryGettableAbstract(RepositoryAbstract, ABC):
-    def get(self, ID: int):
+    def get(self, ID: int) -> "RepositoryGettableAbstract._Model":
         return dbs.execute(
             select(self._Model)
             .where(self._Model.ID == ID)
@@ -51,7 +48,10 @@ class IFacade(Protocol):
 
 @dataclass
 class FacadeAbstract(ABC, IFacade):
-    ...
+    Repo: RepositoryAbstract
+    model: ModelBase
+    entry: type
+    dto: flask_restx.Model
 
 
 class FacadeAbstractOld(ABC):
