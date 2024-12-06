@@ -56,6 +56,25 @@ class ActionLogRepository(RepositoryGettableAbstract, Singleton):
     def get(self, ID: int):
         return super().get(ID)
 
+    # def create(self,
+    #            userID: int,
+    #            title: str,
+    #            date: datetime.datetime = None,
+    #            cash: int = None,
+    #            xp: int = None,
+    #            hp: int = None,
+    #            sp: int = None
+    #            ):
+    #     return super().create(
+    #         userID=userID,
+    #         title=title,
+    #         date=date,
+    #         cash=cash,
+    #         xp=xp,
+    #         hp=hp,
+    #         sp=sp
+    #     )
+
     @staticmethod
     def get_all_by_user(userID: int, limit: int = 100) -> tuple[_Model]:
         res = dbs.execute(

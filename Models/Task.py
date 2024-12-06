@@ -1,21 +1,19 @@
 import sqlalchemy as db
-from interface import implements
 from sqlalchemy import ForeignKey as FK, DateTime, String
 from sqlalchemy.orm import Mapped as Type, mapped_column as props, relationship as rltn
 
 from Models.ModelBase import ModelBase
 from Models.Objective import ObjectiveModel
 from Models.utility import cascade_relation as reltn
-from app_database import database as appdb
+from app_database import database
 from design_patterns import Singleton
-# from interfaces import IRepository
 
 
 class TaskModel(ModelBase):
     __tablename__ = "tasks"
 
     title:  Type[str] = props(String(32))
-    status: Type[str]  # Set(ToDo, Doing, Done)
+    status: Type[str]  # Set(To-do, Doing, Done)
     due = props(DateTime, nullable=True)
 
     xp:   Type[int] = props(nullable=True)
@@ -49,7 +47,7 @@ class TaskRepository(Singleton):
         return self._Model
 
     def get(self, ID: int):
-        return appdb.session.execute(
+        return database.session.execute(
             db.select(self._Model)
             .where(self._Model.ID == ID)
         ).scalar_one_or_none()
@@ -57,13 +55,18 @@ class TaskRepository(Singleton):
     def create(self, userID, title) -> TaskModel:
         task = self._Model(userID, title)
         task.status = "ToDo"
-        appdb.session.add(task)
-        appdb.session.commit()
+        database.session.add(task)
+        database.session.commit()
         return task
 
     def get_all_by_user(self, userID: int) -> tuple[_Model]:
-        res = appdb.session.execute(
+        res = database.session.execute(
             db.select(self._Model)
             .where(self._Model.userID == int(userID))
         ).scalars().all()
         return res
+
+    @staticmethod
+    def edit(task: _Model, **kwargs):
+        task.__dict__.update(kwargs)
+        database.session.commit()

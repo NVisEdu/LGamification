@@ -7,3 +7,7 @@ from sqlalchemy.orm import (Mapped as Type,
 
 class ModelBase(DeclarativeBase):
     ID: Type[int] = props(primary_key=True)
+
+    @abstractmethod
+    def __call__(self, *args, **kwargs):
+        ...

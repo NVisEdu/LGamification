@@ -1,12 +1,11 @@
-from typing import cast, Union
+from typing import Union
 
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from Models.Task import TaskModel, TaskRepository
+from Models import TaskRepository
 from Services.Calculator import Calc, Difficulty, Duration
 from abstractions import FacadeAbstract
-from api_models import task_dto
-from app_database import database
+from Controllers.api_models import task_dto
 
 
 class TaskFacade(FacadeAbstract):
@@ -41,14 +40,14 @@ class TaskFacade(FacadeAbstract):
         if type(duration) is str:
             duration = Duration[duration]
 
-        self.entry.xp   = Calc.xp(difficulty)
-        self.entry.cash = Calc.cash(duration)
-
-        database.session.commit()
+        self.Repo.edit(
+            self.entry,
+            xp=Calc.xp(difficulty),
+            cash=Calc.cash(duration)
+        )
 
     def complete(self):
-        self.entry.status = "Done"
-        database.session.commit()
+        self.Repo.edit(self.entry, status="Done")
 
     def to_dict(self):
         res = self.__dict__

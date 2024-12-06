@@ -11,7 +11,7 @@ ns = Namespace("user")
 @ns.route("/<int:userID>")
 class Index(Controller):
     @api.marshal_with(User.dto)
-    def get(self, userID: int):
+    async def get(self, userID: int):
         check_session(userID)
 
         user = User.get(userID).entry
@@ -30,7 +30,7 @@ class Index(Controller):
 
     @ns.expect(userput_dto)
     @api.marshal_with(User.dto)
-    def put(self, userID: int) -> User.model:
+    async def put(self, userID: int) -> User.model:
         check_session(userID)
 
         user = edit_model_fields(
@@ -45,7 +45,7 @@ class Index(Controller):
 @ns.route("/<userID>/stats")
 class Stats(Controller):
     @api.marshal_with(User.dto)
-    def get(self, userID: int) -> Response:
+    async def get(self, userID: int) -> Response:
         check_session(userID)
 
         return Index().get(userID)
@@ -59,7 +59,7 @@ class UserPassword(Controller):
     })
 
     @ns.expect(password_model)
-    def put(self, userID: int) -> Response:
+    async def put(self, userID: int) -> Response:
         check_session(userID)
 
         password = str(request.form["password"])

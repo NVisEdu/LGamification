@@ -23,8 +23,8 @@ class RepositoryAbstract(Singleton, ABC):
                 f"attribute that is a subclass of `ModelBase`."
             )
 
-    def create(self, *args) -> "_Model":
-        res = self._Model(*args)
+    def create(self, *args, **kwargs) -> "_Model":
+        res = self._Model(*args, **kwargs)
         dbs.add(res)
         dbs.commit()
         return res

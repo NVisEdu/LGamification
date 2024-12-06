@@ -8,7 +8,7 @@ class ObjectiveModel(appdb.modelBase):
     __tablename__ = 'objectives'
 
     title: Type[str]  = props(String(32))
-    status: Type[str] = props(String(16))  # Set(ToDo, Doing, Done)
+    status: Type[str] = props(String(16))  # Set(To-do, Doing, Done)
     due = DateTime()
 
     xp: Type[int]

@@ -1,10 +1,6 @@
-import datetime
-
-from Models import ActionLogModel
-from Models.ActionLog import ActionLogModel, ActionLogRepository
+from Controllers.api_models import journal_dto
+from Models.ActionLog import ActionLogRepository
 from abstractions import FacadeAbstract
-from api_models import journal_dto
-from app_database import database
 
 
 class JournalFacade(FacadeAbstract):

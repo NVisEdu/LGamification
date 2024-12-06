@@ -22,7 +22,7 @@ auth_parser.add_argument('password', location='form', type=str, required=True)
 class Resister(Controller):
     @ns.expect(auth_parser, validate=True)
     # @api.marshal_with(User.marshal)
-    def post(self) -> Response:
+    async def post(self) -> Response:
         # username: str = request.form.get("username")
         # password: str = request.form.get("password")
 
@@ -44,7 +44,7 @@ class Resister(Controller):
 @ns.route("/login")
 class Login(Controller):
     @ns.expect(auth_parser, validate=True)
-    def post(self) -> Response:
+    async def post(self) -> Response:
         if session.get("sessionkey"):
             abort(400, "Already logged in.")
 
@@ -68,7 +68,7 @@ class Login(Controller):
 @ns.route("/logout")
 class Logout(Controller):
     @staticmethod
-    def post() -> Response:
+    async def post() -> Response:
         sessionkey = session.get("sessionkey")
         if not sessionkey:
             return resp("No sessionkey was found.")
@@ -81,5 +81,5 @@ class Logout(Controller):
 @ns.route("/reset-password")
 class ResetPassword(Controller):
     @staticmethod
-    def post() -> Response:
+    async def post() -> Response:
         return abort(501)  # Not Implemented

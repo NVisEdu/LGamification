@@ -18,7 +18,7 @@ user_param = ()
 @ns.route("/")
 class Index(Resource):
     @api.marshal_list_with(Task.dto)
-    def get(self, userID: int) -> Sequence:
+    async def get(self, userID: int) -> Sequence:
         check_session(userID)
 
         res = Task.Repo.get_all_by_user(userID)
@@ -26,7 +26,7 @@ class Index(Resource):
 
     @api.marshal_with(Task.dto)
     @api.param("title", type=str)
-    def post(self, userID: int) -> Task.model:
+    async def post(self, userID: int) -> Task.model:
         check_session(userID)
 
         title = request.args.get("title")
@@ -40,7 +40,7 @@ class Index(Resource):
 @ns.route("/<int:taskID>")
 class TaskEntry(Resource):
     @api.marshal_with(Task.dto)
-    def get(self, userID: int, taskID: int) -> Task.model:
+    async def get(self, userID: int, taskID: int) -> Task.model:
         check_session(userID)
 
         res = Task.get(taskID)
@@ -59,7 +59,7 @@ class TaskEntry(Resource):
 
     @ns.expect(taskput_dto)
     @api.marshal_with(Task.dto)
-    def put(self, userID: int, taskID: int) -> Task.model:
+    async def put(self, userID: int, taskID: int) -> Task.model:
         check_session(userID)
 
         return edit_model_fields(
@@ -72,7 +72,7 @@ class TaskEntry(Resource):
 @ns.route("/<int:taskID>/calc_rewards")
 class TaskCalc(Resource):
     @api.marshal_with(Task.dto)
-    def get(self, userID: int, taskID: int) -> Task.model:
+    async def post(self, userID: int, taskID: int) -> Task.model:
         check_session(userID)
 
         task = Task.get(taskID)
@@ -86,7 +86,8 @@ class TaskCalc(Resource):
 
 @ns.route("/<int:taskID>/complete")
 class CompleteTask(Resource):
-    def post(self, userID: int, taskID: int):
+    @staticmethod
+    async def post(userID: int, taskID: int):
         check_session(userID)
 
         task = Task.get(taskID)
