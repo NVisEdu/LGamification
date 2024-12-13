@@ -14,18 +14,15 @@ logger.debug("Namespace created: \"Auth\"")
 
 
 auth_parser = reqparse.RequestParser()
-auth_parser.add_argument('username', location='form', type=str, required=True)
-auth_parser.add_argument('password', location='form', type=str, required=True)
+auth_parser.add_argument("username", location='form', type=str, required=True)
+auth_parser.add_argument("password", location='form', type=str, required=True)
 
 
 @ns.route("/register")
 class Resister(Controller):
     @ns.expect(auth_parser, validate=True)
     # @api.marshal_with(User.marshal)
-    async def post(self) -> Response:
-        # username: str = request.form.get("username")
-        # password: str = request.form.get("password")
-
+    def post(self) -> Response:
         args = auth_parser.parse_args()
         username: str = args["username"]
         password: str = args["password"]
@@ -44,7 +41,7 @@ class Resister(Controller):
 @ns.route("/login")
 class Login(Controller):
     @ns.expect(auth_parser, validate=True)
-    async def post(self) -> Response:
+    def post(self) -> Response:
         if session.get("sessionkey"):
             abort(400, "Already logged in.")
 
@@ -68,7 +65,7 @@ class Login(Controller):
 @ns.route("/logout")
 class Logout(Controller):
     @staticmethod
-    async def post() -> Response:
+    def post() -> Response:
         sessionkey = session.get("sessionkey")
         if not sessionkey:
             return resp("No sessionkey was found.")
@@ -81,5 +78,5 @@ class Logout(Controller):
 @ns.route("/reset-password")
 class ResetPassword(Controller):
     @staticmethod
-    async def post() -> Response:
+    def post() -> Response:
         return abort(501)  # Not Implemented
