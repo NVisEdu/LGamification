@@ -68,5 +68,6 @@ class TaskRepository(Singleton):
 
     @staticmethod
     def edit(task: _Model, **kwargs):
-        task.__dict__.update(kwargs)
+        for prop in kwargs.keys():
+            setattr(task, prop, kwargs[prop])
         database.session.commit()

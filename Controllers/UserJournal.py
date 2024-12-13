@@ -14,9 +14,7 @@ class Journal(Controller):
     def get(self, userID: int) -> tuple[JournalFacade.model]:
         check_session(userID)
 
-        res = JournalFacade.get_by_user(userID)
-        logger.debug(res[0].__dict__)
-        return res
+        return JournalFacade.get_by_user(userID)
 
 
 @ns.route("/<int:entryID>")
