@@ -34,6 +34,10 @@ class UserFacade(FacadeAbstract):
         del res["password"]
         return res
 
+    def delete(self):
+        self.Repo.delete(self.entry)
+        # ToDo delete all sessions
+
     def log(self, title: str,
             date: datetime.datetime = None,
             cash: int = None,

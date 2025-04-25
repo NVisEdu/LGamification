@@ -41,6 +41,12 @@ class Index(Controller):
 
         return user
 
+    @staticmethod
+    def delete(userID: int) -> User.model:
+        check_session(userID)
+
+        (User.get(userID)).delete()
+
 
 @ns.route("/<userID>/stats")
 class Stats(Controller):
