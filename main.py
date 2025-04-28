@@ -4,6 +4,10 @@ import logging
 from App import app, api, logger
 from Controllers import namespaces
 from app_database import Database
+from flask_cors import CORS
+
+
+CORS(app, supports_credentials=True)
 
 # Flask
 app.secret_key = "very_secret_key_bro_trust_me_its_secure_af_i_bet_ur_mom"
@@ -25,7 +29,7 @@ for ns in namespaces:
 def main():
     logger.debug(f"App launched: {api}")
     Database()
-    app.run(debug=True, use_reloader=False)
+    app.run(host="193.201.15.217:5050", debug=True, use_reloader=False)
 
 
 if __name__ == '__main__':

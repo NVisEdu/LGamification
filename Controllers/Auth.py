@@ -35,7 +35,7 @@ class Resister(Controller):
             abort(500)
 
         # return new_user
-        return resp()
+        return resp( {"user_ID": new_user.ID} )
 
 
 @ns.route("/login")
@@ -53,13 +53,15 @@ class Login(Controller):
         if error:
             abort(error["code"], error["msg"])
 
-        sessionkey = SessionRepository().create(user.entry.ID).key
+        user_ID = user.entry.ID
+
+        sessionkey = SessionRepository().create(user_ID).key
 
         if not sessionkey:
             abort(500)
 
         session["sessionkey"] = sessionkey
-        return resp()
+        return resp( {"user_ID": user_ID} )
 
 
 @ns.route("/logout")
