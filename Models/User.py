@@ -20,7 +20,8 @@ class UserModel(appdb.modelBase):
 
     username: Col[str] = props(String(16))
     password: Col[str] = props(String(32))
-    nickname: Col[str] = props(String(32), nullable=True)
+    nickname: Col[str|None] = props(String(32), nullable=True)
+    pfp:      Col[str|None] = props(String(32), nullable=True)
 
     lvl:      Col[int]
     xp:       Col[int]
@@ -46,6 +47,7 @@ class UserModel(appdb.modelBase):
     def __init__(self, username: str, password: str):
         self.username = username
         self.password = generate_password_hash(password)
+        self.pfp = None
         self.lvl = 0
         self.xp = 0
         self.cash = 100
@@ -61,7 +63,7 @@ class UserRepository(RepositoryGettableAbstract):
         return self._Model
 
     def get(self, ID: int):
-        return cast(self._Model, super().get(ID))
+        return cast( self._Model, super().get(ID) )
 
     @staticmethod
     def delete(user: UserModel):

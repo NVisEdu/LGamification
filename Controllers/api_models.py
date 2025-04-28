@@ -7,6 +7,7 @@ user_dto = api.model("User", {
     "ID": fields.Integer,
     "username": fields.String,
     "nickname": fields.String,
+    "pfp":    fields.String,
     "lvl":    fields.Integer,
     "xp":     fields.Integer,
     "cash":   fields.Integer,

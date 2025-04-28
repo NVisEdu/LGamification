@@ -21,6 +21,7 @@ class Index(Controller):
     userput_dict = {
         "username": fields.String(required=False),
         "nickname": fields.String(required=False),
+        "pfp":      fields.String(required=False),
         "cash":   fields.Integer(required=False),
         "xp":     fields.Integer(required=False),
         "lvl":    fields.Integer(required=False),
