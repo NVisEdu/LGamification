@@ -1,6 +1,6 @@
 /BrainoteD/
 .idea
 .venv
-data.db
+data/data.db
 interface_test.py
 interfaces.py

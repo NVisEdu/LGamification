@@ -1,9 +1,8 @@
-import datetime
 import logging
 
-from App import app, api, logger
-from Controllers import namespaces
-from app_database import Database
+from app.core.App import app, api, logger
+from app.controllers import namespaces
+from app.database.db_init import Database
 from flask_cors import CORS
 
 
