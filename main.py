@@ -29,7 +29,7 @@ def main():
     logger.debug(f"App launched: {api}")
     Database()
     app.run(
-        host="193.201.15.217:5050",
+        # host="193.201.15.217:5050",
         debug=True, use_reloader=False
     )
 

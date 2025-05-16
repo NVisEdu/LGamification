@@ -66,8 +66,8 @@ class Login(Controller):
 @ns.route("/logout")
 class Logout(Controller):
     @staticmethod
-    def post() -> Response:
-        sessionkey = session.get("sessionkey")
+    def post(sessionkey) -> Response:
+        # sessionkey = session.get("sessionkey")
         if not sessionkey:
             return resp("No sessionkey was found.")
 

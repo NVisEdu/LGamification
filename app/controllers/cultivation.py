@@ -27,8 +27,8 @@ class Index(Resource):
     @api.param("title", type=str)
     @api.param("xp_reward", type=int)
     @api.param("hp_penalty", type=int)
-    def post(self, userID: int) -> Cultivator.model:
-        check_session(userID)
+    def post(self, userID: int, sessionkey) -> Cultivator.model:
+        check_session(userID, sessionkey)
 
         title = request.args.get("title")
         xp_reward  = int(request.args.get("xp_reward")  or 0)
@@ -43,8 +43,8 @@ class Index(Resource):
 @ns.route("/<int:cultivatorID>")
 class CultivatorEntry(Resource):
     @api.marshal_with(Cultivator.dto)
-    def get(self, userID: int, cultivatorID: int) -> Cultivator.model:
-        check_session(userID)
+    def get(self, userID: int, cultivatorID: int, sessionkey) -> Cultivator.model:
+        check_session(userID, sessionkey)
 
         res = Cultivator.get(cultivatorID)
         return res.entry
@@ -60,8 +60,8 @@ class CultivatorEntry(Resource):
 
     @ns.expect(cultivatorput_dto)
     @api.marshal_with(Cultivator.dto)
-    def put(self, userID: int, cultivatorID: int) -> Cultivator.model:
-        check_session(userID)
+    def put(self, userID: int, cultivatorID: int, sessionkey: str) -> Cultivator.model:
+        check_session(userID, sessionkey)
 
         return edit_model_fields(
             facade=Cultivator.get(cultivatorID),
@@ -73,8 +73,8 @@ class CultivatorEntry(Resource):
 @ns.route("/<int:cultivatorID>/complete")
 class CompleteCultivator(Resource):
     @staticmethod
-    def post(userID: int, cultivatorID: int):
-        check_session(userID)
+    def post(userID: int, cultivatorID: int, sessionkey: str):
+        check_session(userID, sessionkey)
 
         cultivator = Cultivator.get(cultivatorID)
         cultivator.complete()

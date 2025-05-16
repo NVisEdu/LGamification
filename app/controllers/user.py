@@ -11,8 +11,8 @@ ns = Namespace("user")
 @ns.route("/<int:userID>")
 class Index(Controller):
     @api.marshal_with(User.dto)
-    def get(self, userID: int):
-        check_session(userID)
+    def get(self, userID: int, sessionkey):
+        check_session(userID, sessionkey)
 
         user = User.get(userID).entry
 
@@ -31,8 +31,8 @@ class Index(Controller):
 
     @ns.expect(userput_dto)
     @api.marshal_with(User.dto)
-    def put(self, userID: int) -> User.model:
-        check_session(userID)
+    def put(self, userID: int, sessionkey) -> User.model:
+        check_session(userID, sessionkey)
 
         user = edit_model_fields(
             facade=User.get(userID),
@@ -43,8 +43,8 @@ class Index(Controller):
         return user
 
     @staticmethod
-    def delete(userID: int) -> User.model:
-        check_session(userID)
+    def delete(userID: int, sessionkey) -> User.model:
+        check_session(userID, sessionkey)
 
         (User.get(userID)).delete()
 
@@ -52,8 +52,8 @@ class Index(Controller):
 @ns.route("/<userID>/stats")
 class Stats(Controller):
     @api.marshal_with(User.dto)
-    def get(self, userID: int) -> Response:
-        check_session(userID)
+    def get(self, userID: int, sessionkey) -> Response:
+        check_session(userID, sessionkey)
 
         return Index().get(userID)
         # Logic will be edited/added if stats will be separated from main user model
@@ -64,8 +64,8 @@ class UserPassword(Controller):
     @ns.expect(ns.model("ChangePassword", {
         "password": fields.String(required=True),
     }))
-    def put(self, userID: int) -> Response:
-        check_session(userID)
+    def put(self, userID: int, sessionkey) -> Response:
+        check_session(userID, sessionkey)
 
         password = request.json["password"]
 
