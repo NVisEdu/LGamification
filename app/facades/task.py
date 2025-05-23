@@ -45,6 +45,6 @@ class TaskFacade(FacadeAbstract):
     def complete(self):
         self.repo.edit(self.entry, status="Done")
 
-    def to_dict(self):
+    def asdict(self):
         res = self.__dict__
         return res

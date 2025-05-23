@@ -53,7 +53,7 @@ class IFacade(Protocol):
     def commit_changes(self):
         ...
 
-    def to_dict(self) -> dict:
+    def asdict(self) -> dict:
         ...
 
 
@@ -61,15 +61,39 @@ class IFacade(Protocol):
 class FacadeAbstract(ABC, IFacade):
     repo: RepositoryAbstract
     dto: flask_restx.Model
+    entry: ModelBase
 
     @classproperty
     def model(self):
         return self.repo.model
 
-    entry: ModelBase
-
     def __init__(self, obj: "model"):
         self.entry = obj
+
+    @staticmethod
+    def __check_if_attr_is_repo_or_dto(name):
+        if name in ("repo", "dto"):
+            raise AttributeError(f"{name} is a read-only class attribute")
+
+    def __setattr__(self, name, value):
+        self.__check_if_attr_is_repo_or_dto(name)
+        super().__setattr__(name, value)
+
+    def __delattr__(self, name):
+        self.__check_if_attr_is_repo_or_dto(name)
+        super().__delattr__(name)
+
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+
+        if not hasattr(cls, 'repo') or not hasattr(cls, 'dto'):
+            raise TypeError(f"{cls.__name__} must define class-level 'repo' and 'dto' attributes")
+
+        def frozen_setattr(cls_, name, value):
+            cls.__check_if_attr_is_repo_or_dto(name)
+            super(cls_, cls_).__setattr__(name, value)
+
+        cls.__setattr__ = classmethod(frozen_setattr)
 
 
 class FacadeAbstractOld(ABC):

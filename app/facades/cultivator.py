@@ -1,14 +1,12 @@
-
 from app.core.abstractions import FacadeAbstract
-from app.models.unused.cultivator import CultivatorRepository
+from app.models import CultivatorRepository
 from app.schemas.api_models import cultivator_dto
 
 
 class CultivatorFacade(FacadeAbstract):
     repo = CultivatorRepository
     dto = cultivator_dto
-
-    entry: CultivatorRepository.model
+    entry: repo.model
 
     def __init__(self, obj: repo.model):
         super().__init__(obj)
@@ -34,6 +32,6 @@ class CultivatorFacade(FacadeAbstract):
     def complete(self):
         self.repo.edit(self.entry, status="Done")
 
-    def to_dict(self):
+    def asdict(self):
         res = self.entry.__dict__
         return res

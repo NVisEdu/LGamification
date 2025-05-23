@@ -17,7 +17,8 @@ __all__ = [
     "TaskRepository",
     "ActionLogRepository",
     "UserRepository",
-    "SessionRepository"
+    "SessionRepository",
+    "CultivatorRepository"
 ]
 
 from app.models.accounts.action_log import ActionLogModel, ActionLogRepository
@@ -29,6 +30,6 @@ from app.models.activities.task import TaskModel, TaskRepository
 from app.models.economy.StoreItem import StoreItemModel
 from app.models.unused.stat import StatModel
 from app.models.unused.tag import TagModel
-from app.models.unused.cultivator import CultivatorModel
+from app.models.unused.cultivator import CultivatorModel, CultivatorRepository
 from app.models.unused.objective import ObjectiveModel
 from app.models.unused.skill import SkillModel

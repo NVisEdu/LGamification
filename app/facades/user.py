@@ -26,7 +26,7 @@ class UserFacade(FacadeAbstract):
     def get_by_name(cls, name: str):
         return cls( cls.repo.get_by_name(name) )
 
-    def to_dict(self):
+    def asdict(self):
         res = self.__dict__
         del res["password"]
         return res

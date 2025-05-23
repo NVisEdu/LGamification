@@ -8,6 +8,7 @@ from flask_cors import CORS
 
 CORS(app, supports_credentials=True)
 
+
 # Flask
 app.secret_key = "very_secret_key_bro_trust_me_its_secure_af_i_bet_ur_mom"
 app.config["SESSION_TYPE"] = "SQLAlchemy"
