@@ -1,4 +1,4 @@
-from flask import make_response as resp, abort, Response, session
+from flask import make_response as resp, abort, Response, session, request
 
 from app.models import SessionRepository
 from app.services.auth import login_check, register_check
@@ -41,7 +41,7 @@ class Resister(Controller):
 class Login(Controller):
     @ns.expect(auth_parser, validate=True)
     def post(self) -> Response:
-        if session.get("sessionkey"):
+        if request.headers.get("SessionKey"):
             abort(400, "Already logged in.")
 
         args = auth_parser.parse_args()
@@ -66,8 +66,8 @@ class Login(Controller):
 @ns.route("/logout")
 class Logout(Controller):
     @staticmethod
-    def post(sessionkey) -> Response:
-        # sessionkey = session.get("sessionkey")
+    def post() -> Response:
+        sessionkey = request.headers.get("SessionKey")
         if not sessionkey:
             return resp("No sessionkey was found.")
 

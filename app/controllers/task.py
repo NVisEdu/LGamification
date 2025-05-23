@@ -17,16 +17,16 @@ user_param = ()
 @ns.route("/")
 class Index(Resource):
     @api.marshal_list_with(Task.dto)
-    def get(self, userID: int, sessionkey) -> Sequence:
-        check_session(userID, sessionkey)
+    def get(self, userID: int) -> Sequence:
+        check_session(userID)
 
         res = Task.repo.get_all_by_user(userID)
         return list(res)
 
     @api.marshal_with(Task.dto)
     @api.param("title", type=str)
-    def post(self, userID: int, sessionkey) -> Task.model:
-        check_session(userID, sessionkey)
+    def post(self, userID: int) -> Task.model:
+        check_session(userID)
 
         title = request.args.get("title")
         if not title:
@@ -39,8 +39,8 @@ class Index(Resource):
 @ns.route("/<int:taskID>")
 class TaskEntry(Resource):
     @api.marshal_with(Task.dto)
-    def get(self, userID: int, taskID: int, sessionkey) -> Task.model:
-        check_session(userID, sessionkey)
+    def get(self, userID: int, taskID: int) -> Task.model:
+        check_session(userID)
 
         res = Task.get(taskID)
         return res.entry
@@ -58,8 +58,8 @@ class TaskEntry(Resource):
 
     @ns.expect(taskput_dto)
     @api.marshal_with(Task.dto)
-    def put(self, userID: int, taskID: int, sessionkey) -> Task.model:
-        check_session(userID, sessionkey)
+    def put(self, userID: int, taskID: int) -> Task.model:
+        check_session(userID)
 
         return edit_model_fields(
             facade=Task.get(taskID),
@@ -71,8 +71,8 @@ class TaskEntry(Resource):
 @ns.route("/<int:taskID>/calc_rewards")
 class TaskCalc(Resource):
     @api.marshal_with(Task.dto)
-    def post(self, userID: int, taskID: int, sessionkey) -> Task.model:
-        check_session(userID, sessionkey)
+    def post(self, userID: int, taskID: int) -> Task.model:
+        check_session(userID)
 
         task = Task.get(taskID)
 
@@ -86,8 +86,8 @@ class TaskCalc(Resource):
 @ns.route("/<int:taskID>/complete")
 class CompleteTask(Resource):
     @staticmethod
-    def post(userID: int, taskID: int, sessionkey):
-        check_session(userID, sessionkey)
+    def post(userID: int, taskID: int):
+        check_session(userID)
 
         task = Task.get(taskID)
         task.complete()

@@ -11,8 +11,8 @@ ns = Namespace("user/<int:userID>/journal")
 @ns.route("/")
 class Journal(Controller):
     @api.marshal_list_with(ActionLog.dto)
-    def get(self, userID: int, sessionkey) -> tuple[ActionLog.model]:
-        check_session(userID, sessionkey)
+    def get(self, userID: int) -> tuple[ActionLog.model]:
+        check_session(userID)
 
         return ActionLog.get_by_user(userID)
 
@@ -20,8 +20,8 @@ class Journal(Controller):
 @ns.route("/<int:entryID>")
 class JournalEntry(Controller):
     @api.marshal_list_with(ActionLog.dto)
-    def get(self, userID: int, entryID, sessionkey) -> tuple[ActionLog.model]:
-        check_session(userID, sessionkey)
+    def get(self, userID: int, entryID) -> tuple[ActionLog.model]:
+        check_session(userID)
 
         return ActionLog.get(entryID).entry
 
@@ -37,8 +37,8 @@ class JournalEntry(Controller):
 
     @ns.expect(journalput_dto)
     @api.marshal_list_with(ActionLog.dto)
-    def put(self, userID: int, entryID, sessionkey) -> ActionLog.model:
-        check_session(userID, sessionkey)
+    def put(self, userID: int, entryID) -> ActionLog.model:
+        check_session(userID)
 
         return edit_model_fields(
             facade=ActionLog.get(entryID),
@@ -47,7 +47,7 @@ class JournalEntry(Controller):
         ).entry
 
     @staticmethod
-    def delete(userID: int, entryID, sessionkey):
-        check_session(userID, sessionkey)
+    def delete(userID: int, entryID):
+        check_session(userID)
 
         ActionLog.get(entryID).delete()

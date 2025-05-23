@@ -1,6 +1,6 @@
 from collections.abc import Sequence
 
-from flask import session, abort
+from flask import abort, request
 
 from app.models import SessionRepository
 from app.core.abstractions import FacadeAbstract
@@ -8,7 +8,7 @@ from app.database.db_init import database
 
 
 def check_session(user_id: int, sessionkey: str = None):
-    sessionkey = sessionkey or session.get("sessionkey")
+    sessionkey = sessionkey or request.headers.get("Authorization")
     session_user = SessionRepository().get(sessionkey)
     if not (session_user and int(user_id) == session_user.userID):
         abort(401)
