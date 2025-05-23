@@ -2,6 +2,7 @@ from flask import request, make_response as resp, Response, abort
 from flask_restx import Resource as Controller, Namespace, fields
 
 from app.core.App import api
+from app.schemas.api_models import userdata_dto
 from app.services.utils import check_session, edit_model_fields
 from app.facades import User
 
@@ -51,11 +52,11 @@ class Index(Controller):
 
 @ns.route("/<userID>/stats")
 class Stats(Controller):
-    @api.marshal_with(User.dto)
+    @api.marshal_with(userdata_dto)
     def get(self, userID: int) -> Response:
         check_session(userID)
 
-        return Index().get(userID)
+        return User().get(userID).entry
         # Logic will be edited/added if stats will be separated from main user model
 
 
