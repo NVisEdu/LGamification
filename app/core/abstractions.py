@@ -9,7 +9,6 @@ from app.models.base import ModelBase
 from app.database.db_init import database
 from app.core.design_patterns import Singleton
 
-
 dbs = database.session
 
 
@@ -33,7 +32,6 @@ class RepositoryAbstract(Singleton, ABC):
 
     @classmethod
     def create(cls, *args, **kwargs) -> "model":
-        # noinspection PyCallingNonCallable
         res = cls.model(*args, **kwargs)
         dbs.add(res)
         dbs.commit()
@@ -89,19 +87,15 @@ class FacadeAbstract(ABC, IFacade):
         if not hasattr(cls, 'repo') or not hasattr(cls, 'dto'):
             raise TypeError(f"{cls.__name__} must define class-level 'repo' and 'dto' attributes")
 
-        def frozen_setattr(cls_, name, value):
-            cls.__check_if_attr_is_repo_or_dto(name)
-            super(cls_, cls_).__setattr__(name, value)
-
-        cls.__setattr__ = classmethod(frozen_setattr)
-
 
 class FacadeAbstractOld(ABC):
     def __init__(self, entry):
         self.entry = entry
-        self._fields = { k: v
-                         for k, v in vars(entry).items()
-                         if k not in ["password"] }
+        self._fields = {
+            k: v
+            for k, v in vars(entry).items()
+            if k != "password"
+        }
 
     def __getattr__(self, attr: str):
         return self._fields.get(attr)
