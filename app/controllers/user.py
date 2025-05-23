@@ -56,7 +56,7 @@ class Stats(Controller):
     def get(self, userID: int) -> Response:
         check_session(userID)
 
-        return User().get(userID).entry
+        return User.get(userID).entry
         # Logic will be edited/added if stats will be separated from main user model
 
 
