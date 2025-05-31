@@ -1,73 +1,69 @@
 from flask import request, make_response as resp, Response, abort
-from flask_restx import Resource as Controller, Namespace, fields
+from flask_restx import Resource as Controller, Namespace, fields, marshal, Model
 
 from app.core.App import api
 from app.schemas.api_models import userdata_dto
-from app.services.utils import check_session, edit_model_fields
+from app.services.utils import edit_model_fields, session_required
 from app.facades import User
 
 ns = Namespace("user")
 
 
+userput_dto = ns.model("Useredit", {
+    "username": fields.String(required=False),
+    "nickname": fields.String(required=False),
+    "pfp": fields.String(required=False),
+    "cash": fields.Integer(required=False),
+    "xp": fields.Integer(required=False),
+    "lvl": fields.Integer(required=False),
+    "hp": fields.Integer(required=False)
+})
+
+change_password_dto = ns.model("ChangePassword", {
+        "password": fields.String(required=True),
+    })
+
+
 @ns.route("/<int:userID>")
 class Index(Controller):
+    method_decorators = [session_required]
+
     @api.marshal_with(User.dto)
     def get(self, userID: int):
-        check_session(userID)
-
-        user = User.get(userID).entry
-
-        return user
-
-    userput_dict = {
-        "username": fields.String(required=False),
-        "nickname": fields.String(required=False),
-        "pfp":      fields.String(required=False),
-        "cash":   fields.Integer(required=False),
-        "xp":     fields.Integer(required=False),
-        "lvl":    fields.Integer(required=False),
-        "hp":     fields.Integer(required=False)
-    }
-    userput_dto = ns.model("Useredit", userput_dict)
+        return User.get(userID).entry
 
     @ns.expect(userput_dto)
     @api.marshal_with(User.dto)
     def put(self, userID: int) -> User.model:
-        check_session(userID)
-
-        user = edit_model_fields(
+        return edit_model_fields(
             facade=User.get(userID),
-            field_names=list(self.userput_dict.keys()),
+            field_names=list(userput_dto.keys()),
             data=request.json
         ).entry
 
-        return user
-
     @staticmethod
     def delete(userID: int) -> User.model:
-        check_session(userID)
+        User.get(userID).delete()
 
-        (User.get(userID)).delete()
+        return resp(204)
 
 
-@ns.route("/<userID>/stats")
+@ns.route("/<int:userID>/stats")
 class Stats(Controller):
+    method_decorators = [session_required]
+
     @api.marshal_with(userdata_dto)
     def get(self, userID: int) -> Response:
-        check_session(userID)
-
         return User.get(userID).entry
         # Logic will be edited/added if stats will be separated from main user model
 
 
-@ns.route("/<userID>/change_password")
+@ns.route("/<int:userID>/change_password")
 class UserPassword(Controller):
-    @ns.expect(ns.model("ChangePassword", {
-        "password": fields.String(required=True),
-    }))
-    def put(self, userID: int) -> Response:
-        check_session(userID)
+    method_decorators = [session_required]
 
+    @ns.expect(change_password_dto)
+    def put(self, userID: int) -> Response:
         password = request.json["password"]
 
         if not password:

@@ -67,12 +67,12 @@ class Login(Controller):
 class Logout(Controller):
     @staticmethod
     def post() -> Response:
-        sessionkey = request.headers.get("SessionKey")
+        sessionkey = request.headers.get("Authorization")
         if not sessionkey:
-            return resp("No sessionkey was found.")
+            return resp("No sessionkey was found.", 401)
 
         SessionRepository().delete_session_by_key(sessionkey)
-        session.pop("sessionkey")
+        request.headers.pop("sessionkey")
         return resp()
 
 

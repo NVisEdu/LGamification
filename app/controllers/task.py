@@ -1,36 +1,42 @@
 from collections.abc import Sequence
 
-from flask import request, abort
+from flask import request, abort, make_response as resp
 from flask_restx import Resource, Namespace, fields
 
 from app.core.App import api
 from app.facades.user import UserFacade
-from app.services.utils import check_session, edit_model_fields
+from app.services.utils import check_session, edit_model_fields, session_required, require_args
 from app.facades.task import TaskFacade as Task
+
 
 ns = Namespace("user/<int:userID>/tasks")
 
 
-user_param = ()
+taskput_dto = ns.model("Taskedit", {
+    "title": fields.String(required=False),
+    "due": fields.DateTime(required=False),
+    "xp": fields.Integer(required=False),
+    "cash": fields.Integer(required=False),
+    "difficulty": fields.String(required=False),  # Set(Easy, Normal, Medium, Hard, Very hard)
+    "duration": fields.String(required=False),  # Set(Quick, Normal, Medium, Long, Very long)
+    "status": fields.String(required=False),
+})
 
 
 @ns.route("/")
 class Index(Resource):
+    method_decorators = [session_required]
+
     @api.marshal_list_with(Task.dto)
     def get(self, userID: int) -> Sequence:
-        check_session(userID)
-
-        res = Task.repo.get_all_by_user(userID)
-        return list(res)
+        return list(
+            Task.repo.get_all_by_user(userID)
+        )
 
     @api.marshal_with(Task.dto)
     @api.param("title", type=str)
     def post(self, userID: int) -> Task.model:
-        check_session(userID)
-
-        title = request.args.get("title")
-        if not title:
-            abort(400, "No title arg provided.")
+        title, = require_args("title")
 
         task = Task.create(userID, title)
         return task.entry
@@ -38,42 +44,28 @@ class Index(Resource):
 
 @ns.route("/<int:taskID>")
 class TaskEntry(Resource):
+    method_decorators = [session_required]
+
     @api.marshal_with(Task.dto)
-    def get(self, userID: int, taskID: int) -> Task.model:
-        check_session(userID)
-
-        res = Task.get(taskID)
-        return res.entry
-
-    taskput_dict = {
-        "title":    fields.String(required=False),
-        "due":      fields.DateTime(required=False),
-        "xp":       fields.Integer(required=False),
-        "cash":     fields.Integer(required=False),
-        "difficulty": fields.String(required=False),  # Set(Easy, Normal, Medium, Hard, Very hard)
-        "duration": fields.String(required=False),   # Set(Quick, Normal, Medium, Long, Very long)
-        "status":   fields.String(required=False),
-    }
-    taskput_dto = ns.model("Taskedit", taskput_dict)
+    def get(self, taskID: int) -> Task.model:
+        return Task.get(taskID).entry
 
     @ns.expect(taskput_dto)
     @api.marshal_with(Task.dto)
-    def put(self, userID: int, taskID: int) -> Task.model:
-        check_session(userID)
-
+    def put(self, taskID: int) -> Task.model:
         return edit_model_fields(
             facade=Task.get(taskID),
-            field_names=list(self.taskput_dict.keys()),
+            field_names=list(taskput_dto.keys()),
             data=request.json
         ).entry
 
 
 @ns.route("/<int:taskID>/calc_rewards")
 class TaskCalc(Resource):
-    @api.marshal_with(Task.dto)
-    def post(self, userID: int, taskID: int) -> Task.model:
-        check_session(userID)
+    method_decorators = [session_required]
 
+    @api.marshal_with(Task.dto)
+    def post(self, taskID: int) -> Task.model:
         task = Task.get(taskID)
 
         if task.entry.difficulty is None or task.entry.duration is None:
@@ -85,10 +77,10 @@ class TaskCalc(Resource):
 
 @ns.route("/<int:taskID>/complete")
 class CompleteTask(Resource):
+    method_decorators = [session_required]
+
     @staticmethod
     def post(userID: int, taskID: int):
-        check_session(userID)
-
         task = Task.get(taskID)
         task.complete()
 
@@ -97,3 +89,5 @@ class CompleteTask(Resource):
                  xp=task.entry.xp,
                  cash=task.entry.cash
                  )
+
+        return resp(204)
