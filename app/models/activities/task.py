@@ -13,7 +13,7 @@ class TaskModel(ModelBase):
     __tablename__ = "tasks"
 
     title:  Type[str] = props(String(32))
-    status: Type[str]  # Set(To-do, Doing, Done)
+    status: Type[str]  # Set(Draft, To-do, Doing, Done)
     due = props(DateTime, nullable=True)
 
     xp:   Type[int] = props(nullable=True)
@@ -32,7 +32,7 @@ class TaskModel(ModelBase):
     def __init__(self,
                  userID: int,
                  title: None | str = None,
-                 status: str = "ToDo"):
+                 status: str = "Draft"):
         super().__init__()
         self.userID = userID
         self.title  = title
@@ -51,7 +51,7 @@ class TaskRepository(Singleton):
     @classmethod
     def create(cls, userID, title) -> TaskModel:
         task = cls.model(userID, title)
-        task.status = "ToDo"
+        task.status = "Draft"
         database.session.add(task)
         database.session.commit()
         return task

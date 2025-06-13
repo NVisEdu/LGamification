@@ -28,6 +28,7 @@ class Index(Resource):
     method_decorators = [session_required]
 
     @api.marshal_list_with(Task.dto)
+    @api.header('sessionkey', type='string')
     def get(self, userID: int) -> Sequence:
         return list(
             Task.repo.get_all_by_user(userID)
@@ -35,6 +36,7 @@ class Index(Resource):
 
     @api.marshal_with(Task.dto)
     @api.param("title", type=str)
+    @api.header('sessionkey', type='string')
     def post(self, userID: int) -> Task.model:
         title, = require_args("title")
 
@@ -47,11 +49,13 @@ class TaskEntry(Resource):
     method_decorators = [session_required]
 
     @api.marshal_with(Task.dto)
+    @api.header('sessionkey', type='string')
     def get(self, taskID: int) -> Task.model:
         return Task.get(taskID).entry
 
     @ns.expect(taskput_dto)
     @api.marshal_with(Task.dto)
+    @api.header('sessionkey', type='string')
     def put(self, taskID: int) -> Task.model:
         return edit_model_fields(
             facade=Task.get(taskID),
@@ -65,6 +69,7 @@ class TaskCalc(Resource):
     method_decorators = [session_required]
 
     @api.marshal_with(Task.dto)
+    @api.header('sessionkey', type='string')
     def post(self, taskID: int) -> Task.model:
         task = Task.get(taskID)
 
@@ -80,6 +85,7 @@ class CompleteTask(Resource):
     method_decorators = [session_required]
 
     @staticmethod
+    @api.header('sessionkey', type='string')
     def post(userID: int, taskID: int):
         task = Task.get(taskID)
         task.complete()
