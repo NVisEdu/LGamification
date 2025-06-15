@@ -5,8 +5,11 @@ from sqlalchemy import ForeignKey as FK, DateTime, String
 from sqlalchemy.orm import Mapped as Type, mapped_column as props
 
 from app.models.base import ModelBase
-from app.database.db_init import database
+from app.database.db_init import database as appdb
 from app.core.design_patterns import Singleton
+
+
+dbs = appdb.session
 
 
 class TaskModel(ModelBase):
@@ -43,7 +46,7 @@ class TaskRepository(Singleton):
     model = TaskModel
 
     def get(self, ID: int):
-        return database.session.execute(
+        return dbs.execute(
             db.select(self.model)
             .where(self.model.ID == ID)
         ).scalar_one_or_none()
@@ -52,13 +55,18 @@ class TaskRepository(Singleton):
     def create(cls, userID, title) -> TaskModel:
         task = cls.model(userID, title)
         task.status = "Draft"
-        database.session.add(task)
-        database.session.commit()
+        dbs.add(task)
+        dbs.commit()
         return task
+
+    @staticmethod
+    def delete(entry: model):
+        dbs.delete(entry)
+        dbs.commit()
 
     @classmethod
     def get_all_by_user(cls, userID: int) -> tuple[model]:
-        res = database.session.execute(
+        res = dbs.execute(
             db.select(cls.model)
             .where(cls.model.userID == int(userID))
         ).scalars().all()
@@ -68,4 +76,4 @@ class TaskRepository(Singleton):
     def edit(task: model, **kwargs):
         for prop in kwargs.keys():
             setattr(task, prop, kwargs[prop])
-        database.session.commit()
+        dbs.commit()

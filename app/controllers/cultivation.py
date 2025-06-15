@@ -63,6 +63,12 @@ class CultivatorEntry(Resource):
             data=request.json
         ).entry
 
+    @staticmethod
+    def delete(cultivatorID: int):
+        Cultivator.get(cultivatorID).delete()
+
+        return resp(204)
+
 
 @ns.route("/<int:cultivatorID>/complete")
 class CompleteCultivator(Resource):

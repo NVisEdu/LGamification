@@ -22,6 +22,10 @@ class TaskFacade(FacadeAbstract):
     def create(cls, userID: int, title: str) -> "TaskFacade":
         return cls(cls.repo().create(userID, title))
 
+    def delete(self):
+        self.repo.delete(self.entry)
+        del self
+
     def calc_rewards(self,
                      difficulty: Union[None, str, "Difficulty"] = None,
                      duration:   Union[None, str, "Duration"]   = None

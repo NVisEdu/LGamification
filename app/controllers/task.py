@@ -63,6 +63,12 @@ class TaskEntry(Resource):
             data=request.json
         ).entry
 
+    @staticmethod
+    def delete(taskID: int):
+        Task.get(taskID).delete()
+
+        return resp(204)
+
 
 @ns.route("/<int:taskID>/calc_rewards")
 class TaskCalc(Resource):

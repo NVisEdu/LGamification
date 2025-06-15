@@ -35,3 +35,7 @@ class CultivatorFacade(FacadeAbstract):
     def asdict(self):
         res = self.entry.__dict__
         return res
+
+    def delete(self):
+        self.repo.delete(self.entry)
+        del self
