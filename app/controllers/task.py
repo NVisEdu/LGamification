@@ -1,4 +1,5 @@
 from collections.abc import Sequence
+from datetime import datetime
 
 from flask import request, abort, make_response as resp
 from flask_restx import Resource, Namespace, fields
@@ -57,10 +58,18 @@ class TaskEntry(Resource):
     @api.marshal_with(Task.dto)
     @api.header('sessionkey', type='string')
     def put(self, taskID: int) -> Task.model:
+        data = request.json.copy()
+
+        if "due" in data and isinstance(data["due"], str):
+            try:
+                data["due"] = datetime.fromisoformat(data['due'])
+            except ValueError:
+                abort(400, "Невірний формат дати. Використовуйте ISO 8601 (наприклад, 2025-06-22T10:59)")
+
         return edit_model_fields(
             facade=Task.get(taskID),
             field_names=list(taskput_dto.keys()),
-            data=request.json
+            data=data
         ).entry
 
     @staticmethod
