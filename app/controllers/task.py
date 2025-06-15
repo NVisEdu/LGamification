@@ -51,13 +51,15 @@ class TaskEntry(Resource):
 
     @api.marshal_with(Task.dto)
     @api.header('sessionkey', type='string')
-    def get(self, taskID: int) -> Task.model:
+    def get(self, userID: int, taskID: int) -> Task.model:
+        _ = userID
         return Task.get(taskID).entry
 
     @ns.expect(taskput_dto)
     @api.marshal_with(Task.dto)
     @api.header('sessionkey', type='string')
-    def put(self, taskID: int) -> Task.model:
+    def put(self, userID: int, taskID: int) -> Task.model:
+        _ = userID
         data = request.json.copy()
 
         if "due" in data and isinstance(data["due"], str):
@@ -73,7 +75,8 @@ class TaskEntry(Resource):
         ).entry
 
     @staticmethod
-    def delete(taskID: int):
+    def delete(userID: int, taskID: int):
+        _ = userID
         Task.get(taskID).delete()
 
         return resp(204)
